@@ -35,7 +35,7 @@ step2:
 error:
     mov si, error_message
     call print
-    ret
+    jmp $
 
 print:
 .loop:
