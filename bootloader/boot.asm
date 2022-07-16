@@ -6,20 +6,6 @@ _start:
 
 times 33 db 0
 
-; IVT interrupts snippet
-; handle_zero:
-;     mov ah, 0eh
-;     mov al, 'A'
-;     mov bx, 0
-;     int 0x10
-;     iret
-; handle_one:
-;     mov ah, 0eh
-;     mov al, 'V'
-;     mov bx, 0
-;     int 0x10
-;     iret
-
 start:
     jmp 0x7c0:step2
 
@@ -33,17 +19,23 @@ step2:
     mov sp, 0x7c00
     sli ; Enables Interrupts
 
-    ; IVT interrupts snippet write to 0x00
-    ; mov word[ss:0x00], handle_zero
-    ; mov word[ss:0x02], 0x7c0
-    ; mov word[ss:0x04], handle_one
-    ; mov word[ss:0x06], 0x7c0
-    ; int 0
-    ; int 1
+    mov ah, 2 ; READ SECTOR COMMAND
+    mov al, 1 ; ONE SECTOR TO READ
+    mov ch, 0 ; Cylinder low 8 bits
+    mov cl, 2 ; READ SECTOR 2
+    mov dh, 0 ; HEAD NUMBER
+    mov bx, buffer ; Where to read
+    int 0x13
+    jc error
 
-    mov si, helloWorldStr
+    mov si, buffer
     call print
     jmp $
+
+error:
+    mov si, error_message
+    call print
+    ret
 
 print:
 .loop:
@@ -62,7 +54,9 @@ print_char:
     int 0x10
     ret
 
-helloWorldStr: db "David Gever Rezach!", 0
+error_message: db 'Failed to load sector', 0
 
 times 510-($ - $$) db 0
 dw 0xAA55
+
+buffer:
