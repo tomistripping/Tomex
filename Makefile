@@ -1,4 +1,8 @@
-BOOTBIN = ./bootloader/boot.bin
+BOOTASM = src/boot/boot.asm
+BOOTBIN = ./bin/boot.bin
 
 all:
-	nasm -f bin bootloader/boot.asm -o $(BOOTBIN)
+	nasm -f bin $(BOOTASM) -o $(BOOTBIN)
+
+clean:
+	rm -rf $(BOOTBIN)
