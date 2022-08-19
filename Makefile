@@ -1,5 +1,7 @@
 BOOTASM = src/boot/boot.asm
 BOOTBIN = ./bin/boot.bin
+BOOTDIR = ./bin/
+BUILDDIR = ./build/
 FILES = ./build/kernel.asm.o
 
 all: ./bin/boot.bin ./bin/kernel.bin
@@ -18,5 +20,10 @@ all: ./bin/boot.bin ./bin/kernel.bin
 ./build/kernel.asm.o: ./src/kernel.asm
 	nasm -f elf -g ./src/kernel.asm -o ./build/kernel.asm.o
 
+mkdir_bin_build:
+	mkdir $(BOOTDIR)
+	mkdir $(BUILDDIR)
+
 clean:
-	rm -rf $(BOOTBIN)
+	rm -rf $(BOOTDIR)
+	rm -rf $(BUILDDIR)
