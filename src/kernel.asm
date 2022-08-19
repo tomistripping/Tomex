@@ -20,3 +20,5 @@ _start:
     out 0x92, al
 
     jmp $
+
+times 510-($ - $$) db 0 ; 510 - (current address - beginning address)
