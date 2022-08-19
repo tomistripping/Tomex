@@ -56,6 +56,10 @@ void terminal_puts(const char* str, char color) {
     }
 }
 
+void print(const char* str) {
+    terminal_puts(str, 15);
+}
+
 void kernel_main() {
     terminal_init();
     // terminal_puts_old(0, 0, "Test tomer king!Test tomer king!Test tomer king!Test tomer king!", 0, 1);
