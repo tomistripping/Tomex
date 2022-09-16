@@ -7,7 +7,8 @@ DATA_SEG equ gdt_data - gdt_start
 _start:
     jmp short start
     nop
-    times 33 db 0
+
+times 33 db 0
 
 start:
     jmp 0:step2
@@ -27,8 +28,7 @@ load_protected:
     mov eax, cr0
     or eax, 0x1
     mov cr0, eax
-    ; jmp CODE_SEG:load32
-    jmp $
+    jmp CODE_SEG:load32
 
 ; GDT
 gdt_start:
@@ -43,7 +43,7 @@ gdt_code:           ; For Code Segment
     dw 0x0            ; base first 0-15 bits
     db 0x0            ; base 16-23 bits
     db 0x9a            ; access byte
-    db 0b11001111    ; high 4 bits (flags) low 4 bits (limit 4 last bits)(limit is 20 bit wide)
+    db 11001111b    ; high 4 bits (flags) low 4 bits (limit 4 last bits)(limit is 20 bit wide)
     db 0x0            ; base 24-31 bits
 
 ; offset 0x10
@@ -52,7 +52,7 @@ gdt_data:            ; DS, SS, ES, FS GS
     dw 0x0            ; base first 0-15 bits
     db 0x0            ; base 16-23 bits
     db 0x92            ; access byte
-    db 0b11001111    ; high 4 bits (flags) low 4 bits (limit 4 last bits)(limit is 20 bit wide)
+    db 11001111b    ; high 4 bits (flags) low 4 bits (limit 4 last bits)(limit is 20 bit wide)
     db 0x0            ; base 24-31 bits
 gdt_end:
 
@@ -60,6 +60,7 @@ gdt_descriptor:
     dw gdt_end - gdt_start - 1 ; Size of the gdt
     dd gdt_start ; Pointer to the beginning of the GDT
 
+[BITS 32]
 load32:
     mov eax, 1
     mov ecx, 100
@@ -68,41 +69,41 @@ load32:
     jmp CODE_SEG:0x0100000
 
 ata_lba_read:
-    mov ebx, eax ; Backup the LBA
-    ; Send the highest 8 bits of the LBA to the hard disk controller
+    mov ebx, eax, ; Backup the LBA
+    ; Send the highest 8 bits of the lba to hard disk controller
     shr eax, 24
-    or eax, 0XE0 ; Select the master drive
+    or eax, 0xE0 ; Select the  master drive
     mov dx, 0x1F6
     out dx, al
-    ; Finished sending LBA
-    
+    ; Finished sending the highest 8 bits of the lba
+
     ; Send the total sectors to read
     mov eax, ecx
     mov dx, 0x1F2
     out dx, al
-    ; Finished sending sectors to read
+    ; Finished sending the total sectors to read
 
     ; Send more bits of the LBA
-    mov eax, ebx ; Restore LBA
-    mov dx, 0x13F
+    mov eax, ebx ; Restore the backup LBA
+    mov dx, 0x1F3
     out dx, al
-    ; Finished sending LBA
+    ; Finished sending more bits of the LBA
 
     ; Send more bits of the LBA
-    mov dx, 0x14F
-    mov eax, ebx ; Restore LBA
+    mov dx, 0x1F4
+    mov eax, ebx ; Restore the backup LBA
     shr eax, 8
     out dx, al
-    ; Finished sending LBA
+    ; Finished sending more bits of the LBA
 
-    ; Send the highest 16 bits of the LBA
-    mov dx, 0x1E5
-    mov eax, ebx ; Restore LBA
+    ; Send upper 16 bits of the LBA
+    mov dx, 0x1F5
+    mov eax, ebx ; Restore the backup LBA
     shr eax, 16
     out dx, al
-    ; Finished sending LBA
+    ; Finished sending upper 16 bits of the LBA
 
-    mov dx, 0X1F7
+    mov dx, 0x1f7
     mov al, 0x20
     out dx, al
 
@@ -112,7 +113,7 @@ ata_lba_read:
 
 ; Checking if we need to read
 .try_again:
-    mov dx, 0X1F7
+    mov dx, 0x1F7
     in al, dx
     test al, 8
     jz .try_again
