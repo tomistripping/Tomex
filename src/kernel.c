@@ -15,6 +15,12 @@ void terminal_putchar(int x, int y, char c, char color) {
 }
 
 void terminal_writechar(char c, char color) {
+    if (c == '\n') {
+        terminal_row++;
+        terminal_col = 0;
+        return;
+    }
+
     terminal_putchar(terminal_col++, terminal_row, c, color);
     if (terminal_col >= VGA_WIDTH) {
         terminal_row++;
@@ -63,5 +69,5 @@ void print(const char* str) {
 void kernel_main() {
     terminal_init();
     // terminal_puts_old(0, 0, "Test tomer king!Test tomer king!Test tomer king!Test tomer king!", 0, 1);
-    terminal_puts("Test tomer qwertyTest tomer qwertyTest tomer qwertyTest tomer qwertyTest tomer qwertyTest tomer qwertyTest tomer qwertyTest tomer qwertyTest tomer qwerty", 3);
+    print("Hello!\nHow are you today?");
 }
